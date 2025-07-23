@@ -1,7 +1,7 @@
 {
     "name": "n8n-nodes-json-validator",
     "version": "0.1.0",
-    "description": "",
+    "description": "This is a custom n8n node that validates JSON data against a schema. It can be used in n8n workflows to ensure that the data being processed meets specific requirements.",
     "keywords": [
         "n8n-community-node-package"
     ],
