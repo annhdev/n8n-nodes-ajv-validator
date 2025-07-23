@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeType,
@@ -26,6 +27,16 @@ export class JsonValidator implements INodeType {
 			// Node properties which the user gets displayed and
 			// can change on the node.
 			{
+				displayName: 'Data Path to Validate',
+				name: 'dataPathToValidate',
+				type: 'string',
+				default: '',
+				description:
+					'The name of the field containing the data to validate. The field must contain a valid JSON object.',
+				placeholder: 'e.g. output, data, payload, json, etc.',
+				requiresDataPath: 'single',
+			},
+			{
 				displayName: 'JSON Schema',
 				name: 'jsonSchema',
 				type: 'json',
@@ -45,7 +56,7 @@ export class JsonValidator implements INodeType {
 					undefined,
 					2,
 				),
-				placeholder: '',
+				placeholder: 'JSON Schema',
 				description:
 					'Visit https://ajv.js.org/ or https://JSON-schema.org/ to learn how to describe your validation rules in JSON Schemas',
 			},
@@ -53,9 +64,12 @@ export class JsonValidator implements INodeType {
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-		const items = this.getInputData();
+		const items: INodeExecutionData[] = this.getInputData();
+		// Get the data to validate from the node parameters
+		const dataPathToValidate = this.getNodeParameter('dataPathToValidate', 0, '') as string;
+		// Get the JSON Schema from the node parameters
 		const jsonSchema = this.getNodeParameter('jsonSchema', 0, '') as string;
-		const ajv = new Ajv();
+		const ajv: Ajv = new Ajv();
 		if (items.length === 0) {
 			return [[]];
 		}
@@ -76,10 +90,18 @@ export class JsonValidator implements INodeType {
 		}
 
 		for (let i = 0; i < items.length; i++) {
-			const item = items[i];
-			const data = item.json;
+			const item: INodeExecutionData = items[i];
+			let data: IDataObject = item.json;
+			if (dataPathToValidate) {
+				data = <IDataObject>item.json[dataPathToValidate];
+			}
 
 			if (validate(data)) {
+				if(dataPathToValidate){
+					// If dataPathToValidate is provided, ensure the output structure matches
+					data = { [dataPathToValidate]: data };
+				}
+
 				output.push({
 					json: data,
 					pairedItem: {
