@@ -12,6 +12,7 @@ export class JsonValidator implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Json Validator',
 		name: 'jsonValidator',
+		icon: { light: 'file:icon.svg', dark: 'file:icon.svg' },
 		group: ['transform'],
 		version: 1,
 		description: 'A node json validator using Ajv (Another JSON validator)',
@@ -79,13 +80,34 @@ export class JsonValidator implements INodeType {
 			const data = item.json;
 
 			if (validate(data)) {
-				output.push(item);
+				output.push({
+					json: data,
+					pairedItem: {
+						item: i,
+					},
+				});
 			} else {
+				// If validation fails, prepare an error message
 				const errorMessage = ajv.errorsText(validate.errors, { separator: ', ' });
-				throw new NodeOperationError(
-					this.getNode(),
-					`Validation failed for item ${i + 1}: ${errorMessage}`,
-				);
+
+				if (this.continueOnFail()) {
+
+					output.push({
+						json: {
+							error: validate.errors,
+							message: `Validation failed for item ${i + 1}: ${errorMessage}`,
+						},
+						pairedItem: {
+							item: i,
+						},
+					});
+				} else {
+					throw new NodeOperationError(
+						this.getNode(),
+						`Validation failed for item ${i + 1}: ${errorMessage}`,
+						{ itemIndex: i },
+					);
+				}
 			}
 		}
 		// If validation is successful, return the valid items
