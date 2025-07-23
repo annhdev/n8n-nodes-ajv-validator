@@ -91,7 +91,6 @@ export class JsonValidator implements INodeType {
 				const errorMessage = ajv.errorsText(validate.errors, { separator: ', ' });
 
 				if (this.continueOnFail()) {
-
 					output.push({
 						json: {
 							error: validate.errors,
@@ -110,6 +109,7 @@ export class JsonValidator implements INodeType {
 				}
 			}
 		}
+
 		// If validation is successful, return the valid items
 		return this.prepareOutputData(output);
 	}
