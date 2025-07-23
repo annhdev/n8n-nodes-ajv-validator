@@ -1,6 +1,6 @@
 ![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
 
-# n8n-nodes-json-validator
+# n8n-nodes-ajv-validator
 
 This is a custom n8n node that validates JSON data against a schema. It can be used in n8n workflows to ensure that the data being processed meets specific requirements.
 
@@ -10,7 +10,7 @@ This is a custom n8n node that validates JSON data against a schema. It can be u
 
 * Install node with:
   ```
-  npm install n8n-nodes-json-validator
+  npm install n8n-nodes-ajv-validator
   ```
 ## Usage
 1. Add the node to your n8n workflow.
